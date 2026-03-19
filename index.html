@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLF LABS | Interactive Homework: My Daily Rhythm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wolf: {
+                            dark: '#0B0F19',
+                            panel: '#151C2C',
+                            emerald: '#1DB954',
+                            accent: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body { background-color: #0B0F19; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        .slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-out { animation: slideOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .glass {
+            background: rgba(21, 28, 44, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: #1DB954;
+            color: #000;
+            box-shadow: 0 4px 20px rgba(29, 185, 84, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #1ed760;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(29, 185, 84, 0.6);
+        }
+
+        .correct-btn {
+            background: #1DB954 !important;
+            border-color: #1DB954 !important;
+            color: black !important;
+            box-shadow: 0 0 15px rgba(29, 185, 84, 0.5);
+        }
+
+        .wrong-btn {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+        
+        .reading-text {
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:not(:disabled):hover {
+            border-color: #1DB954;
+            background: rgba(29, 185, 84, 0.1);
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="glass h-20 flex items-center justify-between px-8 z-50 sticky top-0 border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-wolf-emerald rounded-lg flex items-center justify-center text-black font-black">W</div>
+            <div class="font-bold tracking-widest text-sm text-gray-100">
+                WOLF LABS <span class="text-wolf-emerald mx-1">|</span> HOMEWORK
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-900 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
+                <span class="text-[10px] font-black text-gray-500 uppercase">Current Score</span>
+                <span id="current-score" class="text-wolf-emerald font-mono font-bold text-xl">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="w-full h-1.5 bg-slate-900 overflow-hidden">
+        <div id="main-progress" class="h-full bg-wolf-emerald transition-all duration-700 shadow-[0_0_10px_#1DB954]" style="width: 0%"></div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <main class="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+        
+        <div id="content-area" class="w-full max-w-3xl slide-in">
+            <!-- Dynamic Content Injected Here -->
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="p-6 text-center text-gray-500 text-xs uppercase tracking-widest font-black">
+        Wolf Labs Premium Series <span class="mx-2">•</span> A1 English Program
+    </footer>
+
+    <script>
+        const exercises = [
+            {
+                type: 'intro',
+                title: 'Daily Rhythm Challenge',
+                text: 'Prove your English skills! Read Mark\'s story and answer 15 targeted questions about daily routines.',
+                button: 'Start My Mission'
+            },
+            {
+                type: 'reading',
+                title: 'Meet Mark',
+                text: `
+                    <p class="mb-4">Hello! I <b>am</b> Mark and I <b>am</b> 30 years old. I live in New York.</p>
+                    <p class="mb-4">Every day, I <b>wake up</b> at 7:00 AM. I <b>drink</b> a large cup of coffee, but I <b>don't eat</b> breakfast because I am not hungry in the morning.</p>
+                    <p class="mb-4">I <b>work</b> in an office from 9:00 AM to 5:00 PM. My wife, Sarah, <b>is</b> a teacher. She <b>works</b> at a local school. We <b>are</b> very happy together.</p>
+                    <p>In the evening, we <b>watch</b> TV or we <b>read</b> books. We <b>don't go</b> to bed late.</p>
+                `,
+                instruction: 'Focus on the bold verbs. They show states and actions!'
+            },
+            {
+                type: 'choice',
+                question: 'Mark ____ 30 years old.',
+                options: ['am', 'is', 'are'],
+                answer: 'is',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'He ____ in New York.',
+                options: ['live', 'lives', 'is live'],
+                answer: 'lives',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'Mark ____ breakfast in the morning.',
+                options: ["don't eat", "doesn't eat", "is not eat"],
+                answer: "doesn't eat",
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: '____ Mark wake up at 7:00 AM?',
+                options: ['Do', 'Does', 'Is'],
+                answer: 'Does',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'His wife, Sarah, ____ a teacher.',
+                options: ['am', 'is', 'are'],
+                answer: 'is',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'Sarah ____ at a school.',
+                options: ['work', 'works', 'working'],
+                answer: 'works',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'They ____ very happy together.',
+                options: ['am', 'is', 'are'],
+                answer: 'are',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'In the evening, they ____ TV.',
+                options: ['watch', 'watches', 'watching'],
+                answer: 'watch',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: '____ they go to bed late?',
+                options: ['Do', 'Does', 'Are'],
+                answer: 'Do',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'I ____ Mark.',
+                options: ['am', 'is', 'are'],
+                answer: 'am',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'Mark ____ a cup of coffee.',
+                options: ['drink', 'drinks', 'is drink'],
+                answer: 'drinks',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'He ____ hungry in the morning.',
+                options: ["am not", "isn't", "don't"],
+                answer: "isn't",
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: '____ you like New York?',
+                options: ['Do', 'Does', 'Are'],
+                answer: 'Do',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'The office ____ open until 5:00 PM.',
+                options: ['am', 'is', 'are'],
+                answer: 'is',
+                userAnswer: null
+            },
+            {
+                type: 'choice',
+                question: 'We ____ to bed early.',
+                options: ['go', 'goes', 'going'],
+                answer: 'go',
+                userAnswer: null
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        function render() {
+            const area = document.getElementById('content-area');
+            const data = exercises[currentIndex];
+            
+            area.innerHTML = '';
+            
+            if (data.type === 'intro') {
+                area.innerHTML = `
+                    <div class="glass p-12 rounded-[40px] text-center shadow-2xl border-white/10">
+                        <div class="w-20 h-20 bg-wolf-emerald/20 text-wolf-emerald rounded-full flex items-center justify-center text-3xl mx-auto mb-8">
+                            <i class="fas fa-flag-checkered"></i>
+                        </div>
+                        <h1 class="text-4xl md:text-5xl font-black mb-6 tracking-tight">${data.title}</h1>
+                        <p class="text-gray-400 text-xl font-light mb-10 max-w-lg mx-auto leading-relaxed">${data.text}</p>
+                        <button onclick="next()" class="btn-primary font-black px-12 py-5 rounded-full text-xl uppercase tracking-widest">
+                            ${data.button}
+                        </button>
+                    </div>
+                `;
+            } else if (data.type === 'reading') {
+                area.innerHTML = `
+                    <div class="glass p-8 md:p-12 rounded-[40px] shadow-2xl border-white/10">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-black text-white">1. Read the Mission</h2>
+                            <span class="text-[10px] bg-wolf-emerald text-black px-3 py-1 rounded-full font-black uppercase tracking-tighter">Text Entry</span>
+                        </div>
+                        <div class="reading-text text-gray-200 bg-slate-900/60 p-8 rounded-3xl border border-white/5 mb-8 shadow-inner">
+                            ${data.text}
+                        </div>
+                        <div class="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl mb-10 text-blue-300">
+                             <i class="fas fa-lightbulb"></i>
+                             <p class="text-sm font-medium italic">${data.instruction}</p>
+                        </div>
+                        
+                        <div class="flex justify-between gap-6">
+                            <button onclick="prev()" class="px-8 py-4 rounded-full text-gray-400 hover:text-white transition font-black uppercase text-xs tracking-widest border border-white/5 hover:bg-white/5">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button onclick="next()" class="btn-primary flex-1 font-black px-8 py-4 rounded-full text-lg uppercase">
+                                Start Questions <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'choice') {
+                const choiceExs = exercises.filter(e => e.type === 'choice');
+                const qNum = exercises.slice(0, currentIndex + 1).filter(e => e.type === 'choice').length;
+                const totalQ = choiceExs.length;
+                
+                area.innerHTML = `
+                    <div class="glass p-8 md:p-12 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden">
+                        <!-- Navigation Top -->
+                        <div class="flex justify-between items-center mb-10">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-wolf-emerald uppercase tracking-widest mb-1">Challenge</span>
+                                <div class="text-xl font-black text-white">Question ${qNum} <span class="text-gray-600">/ ${totalQ}</span></div>
+                            </div>
+                            <button onclick="prev()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-800 border border-white/5 text-gray-400 hover:text-white transition shadow-lg">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+
+                        <h2 class="text-3xl md:text-4xl font-light text-white mb-12 leading-tight">
+                            ${data.question.replace('____', '<span class="text-wolf-emerald font-black underline underline-offset-8">____</span>')}
+                        </h2>
+
+                        <div class="grid gap-4 mb-10">
+                            ${data.options.map(opt => {
+                                let cls = 'bg-slate-800/40 border-white/10 text-gray-300';
+                                let icon = 'fa-chevron-right opacity-20';
+                                
+                                if(data.userAnswer) {
+                                    if(opt === data.answer) {
+                                        cls = 'correct-btn';
+                                        icon = 'fa-check';
+                                    } else if (data.userAnswer === opt) {
+                                        cls = 'wrong-btn';
+                                        icon = 'fa-times';
+                                    } else {
+                                        cls = 'bg-slate-900/60 border-white/5 text-gray-600 opacity-50';
+                                    }
+                                }
+
+                                return `
+                                    <button onclick="handleAnswer(this, '${opt}')" ${data.userAnswer ? 'disabled' : ''} 
+                                        class="option-btn border p-6 rounded-3xl text-xl font-bold transition flex items-center justify-between group ${cls}">
+                                        <span>${opt}</span>
+                                        <i class="fas ${icon} transition group-hover:opacity-100 group-hover:translate-x-1"></i>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div id="next-action-container" class="${data.userAnswer ? 'flex' : 'hidden'} justify-center">
+                            <button onclick="next()" class="btn-primary w-full py-5 rounded-3xl text-xl font-black uppercase tracking-widest flex items-center justify-center gap-4">
+                                ${currentIndex === exercises.length - 1 ? 'See Final Results' : 'Next Question'} 
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="${data.userAnswer ? 'hidden' : 'flex'} justify-center">
+                             <p class="text-gray-500 text-xs font-black uppercase tracking-widest italic">Pick an answer to continue</p>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'results') {
+                const choiceExs = exercises.filter(e => e.type === 'choice');
+                const totalQ = choiceExs.length;
+                const percentage = Math.round((score / totalQ) * 100);
+                
+                area.innerHTML = `
+                    <div class="glass p-12 rounded-[50px] text-center shadow-2xl border-wolf-emerald/40 relative">
+                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-wolf-emerald text-black font-black px-8 py-3 rounded-full shadow-2xl text-sm uppercase tracking-widest">Mission Complete</div>
+                        
+                        <div class="mt-8 mb-12">
+                             <div class="text-8xl font-black text-white mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">${percentage}%</div>
+                             <div class="text-wolf-emerald font-black tracking-[0.4em] uppercase text-sm">Accuracy Score</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-10">
+                            <div class="bg-slate-900/80 p-6 rounded-3xl border border-white/5 text-left">
+                                <div class="text-[10px] font-black text-gray-500 uppercase mb-1">Correct Tasks</div>
+                                <div class="text-2xl font-black text-white">${score} / ${totalQ}</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-6 rounded-3xl border border-white/5 text-left">
+                                <div class="text-[10px] font-black text-gray-500 uppercase mb-1">Status</div>
+                                <div class="text-2xl font-black text-emerald-400">PASSED</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-900/20 p-8 rounded-[35px] border border-emerald-500/30 flex flex-col items-center gap-6 mb-10">
+                            <div class="w-16 h-16 bg-emerald-500 text-black rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="text-white font-black text-xl mb-2">Screenshot Time!</h4>
+                                <p class="text-gray-400 font-light text-sm max-w-xs mx-auto">Take a photo of this screen and send it to your teacher to discuss any mistakes!</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-4">
+                            <button onclick="location.reload()" class="bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition">
+                                Restart Mission
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function handleAnswer(btn, opt) {
+            const data = exercises[currentIndex];
+            if (data.userAnswer) return;
+            
+            data.userAnswer = opt;
+            const isCorrect = opt === data.answer;
+            
+            if (isCorrect) score++;
+            
+            // UI Update is handled by re-rendering slightly or updating classes
+            document.getElementById('current-score').innerText = score;
+            
+            // Re-render immediately to show the "Next" button and correct state
+            render();
+        }
+
+        function next() {
+            if (currentIndex >= exercises.length - 1) {
+                if(exercises[currentIndex].type !== 'results') {
+                    exercises.push({ type: 'results' });
+                    currentIndex++;
+                }
+            } else {
+                currentIndex++;
+            }
+            
+            transition('next');
+        }
+
+        function prev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                transition('prev');
+            }
+        }
+
+        function transition(dir) {
+            const area = document.getElementById('content-area');
+            area.classList.remove('slide-in');
+            area.classList.add('slide-out');
+            
+            setTimeout(() => {
+                render();
+                area.classList.remove('slide-out');
+                area.classList.add('slide-in');
+                updateProgress();
+            }, 400);
+        }
+
+        function updateProgress() {
+            const choiceExercises = exercises.filter(e => e.type === 'choice');
+            const total = choiceExercises.length;
+            const currentChoiceIndex = exercises.slice(0, currentIndex + 1).filter(e => e.type === 'choice').length;
+            
+            let percent = 0;
+            if (exercises[currentIndex].type === 'results') {
+                percent = 100;
+            } else if (exercises[currentIndex].type === 'choice') {
+                percent = (currentChoiceIndex / total) * 100;
+            } else if (exercises[currentIndex].type === 'reading') {
+                percent = 10;
+            } else if (exercises[currentIndex].type === 'intro') {
+                percent = 0;
+            }
+
+            document.getElementById('main-progress').style.width = percent + '%';
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
